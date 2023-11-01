@@ -1,7 +1,7 @@
 # High-level design
 ## Application Architecture
 ### Diagram
-[Link to Lucidchart](https://lucid.app/lucidchart/46d3f75f-e18d-434b-a764-33db2f0f6cc6/edit?view_items=uOSIrlZhB-Ub%2COETI-mDHDvcp%2CVFTIlm.skYEQ%2CiPSIY5i94E.N%2CEFTIn17EvMsk%2CE0SIV1gqAg.4%2C6WSIEUyOVW-~%2CuUSIzU8aqxHS%2CaGTIgjE.wFU-%2CnGTILsVdm3X1%2CrUSIGnVn_PLG%2CgFTICVsIFrp5%2CEGTIGg0ykW3C&invitationId=inv_1814f6ab-0de8-45a3-8abf-234cca2ee2c0)
+[Link to Lucidchart]([https://lucid.app/lucidchart/46d3f75f-e18d-434b-a764-33db2f0f6cc6/edit?view_items=uOSIrlZhB-Ub%2COETI-mDHDvcp%2CVFTIlm.skYEQ%2CiPSIY5i94E.N%2CEFTIn17EvMsk%2CE0SIV1gqAg.4%2C6WSIEUyOVW-~%2CuUSIzU8aqxHS%2CaGTIgjE.wFU-%2CnGTILsVdm3X1%2CrUSIGnVn_PLG%2CgFTICVsIFrp5%2CEGTIGg0ykW3C&invitationId=inv_1814f6ab-0de8-45a3-8abf-234cca2ee2c0](https://lucid.app/lucidspark/invitations/accept/inv_7fe0188e-fcb1-4dcc-981c-2f0019bb9fdc))
 ### Step to deploy to the Cloud
   1. We choose render.com to host the web servers.
   2. Packaging our application in to docker containers.
