@@ -24,3 +24,9 @@ Validation: One order can have one validation process and one card can have many
 Transaction: transaction happens after validation, when validation was successful. Lifecylce of card validation and transaction record is strongly related in that if we delete transaction, we also delete validation. If validation was not successful, we don’t need to create a transaction record, and just return. We process debit and credit card differently in transaction. After each processing method, it will update the owner’s account balance.
 
 Card: One customer can have many cards. When user inputs card number, we validate the card using Luhn’s algorithm. Each card has card type of debit or credit.
+
+User: main target of the project is business owners. Owners should be able to register, login, and pass authentication process to access their dashboard. Parent class of merchant and customer.
+
+Customer: Not sure yet if we need to store customers' login information in database but for now, it makes sense customer class inherits from user class.
+
+Merchant: This class is to represent business owners. Should have user id, and account balance. Username is inherited from user class. 
