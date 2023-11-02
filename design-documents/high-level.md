@@ -17,6 +17,10 @@
 [Link to Figma](https://www.figma.com/file/x1LuRa2y4Wm83u2NRH9tiy/Untitled?type=design&node-id=0%3A1&mode=design&t=pX7MuVYy0nwR7qRI-1)
 ### Description of Backend Modules 
 
+Order:One user can have many orders. Order happens after the user placed, when the user registered, an order can be created with a unique orderID the moment the user places, and stored in the order history referring to the user.
+
+Validation: One order can have one validation process and one card can have many validation times. Once the order is placed and if the card is a debit card, the system will validate whether the debit balance covers the order amount. If the card is a credit card, the system will validate the card number by using the Luhn Algorithm, and return a boolean value when validation completes. 
+
 Transaction: transaction happens after validation, when validation was successful. Lifecylce of card validation and transaction record is strongly related in that if we delete transaction, we also delete validation. If validation was not successful, we don’t need to create a transaction record, and just return. We process debit and credit card differently in transaction. After each processing method, it will update the owner’s account balance.
 
 Card: One customer can have many cards. When user inputs card number, we validate the card using Luhn’s algorithm. Each card has card type of debit or credit.
