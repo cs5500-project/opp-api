@@ -181,7 +181,6 @@ async def update_student(id: str, student: UpdateStudentModel = Body(...)):
             return update_result
         else:
             raise HTTPException(status_code=404, detail=f"Student {id} not found")
-
     # The update is empty, but we should still return the matching document:
     if (existing_student := await student_collection.find_one({"_id": id})) is not None:
         return existing_student
