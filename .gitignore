@@ -2,6 +2,7 @@
 #######################
 .venv*
 .coverage
+.env
 
 # IDEA Ignores #
 ################

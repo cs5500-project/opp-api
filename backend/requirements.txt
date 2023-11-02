@@ -1,0 +1,9 @@
+certifi
+fastapi
+pydantic
+pydantic-core
+pydantic[email]
+motor
+pymongo
+uvicorn
+python-dotenv
