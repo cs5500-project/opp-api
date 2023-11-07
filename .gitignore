@@ -1,6 +1,7 @@
 # Environmental Files #
 #######################
 .venv*
+.env
 .coverage
 
 # IDEA Ignores #
