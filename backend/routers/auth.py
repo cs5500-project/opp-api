@@ -21,11 +21,11 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 """
 
 load_dotenv()  # take environment variables from .env.
-os.environ.get("SECRET_KEY")
-os.environ.get("ALGORITHM")
+SECRET_KEY = os.environ.get("SECRET_KEY")
+ALGORITHM = os.environ.get("ALGORITHM")
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 class CreateUserRequest(BaseModel):
@@ -33,11 +33,13 @@ class CreateUserRequest(BaseModel):
     first_name: str
     surname: str
     password: str
+    store_name: str
 
 
 class Token(BaseModel):
     access_token: str
     token_type: str
+
 
 def get_db():
     db = SessionLocal()
@@ -46,5 +48,79 @@ def get_db():
     finally:
         db.close()
 
+
 db_dependency = Annotated[Session, Depends(get_db)]
 
+
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
+    found_user = db.query(Users).filter(create_user_request.username == Users.username).first()
+    if found_user:
+        raise HTTPException(status_code=400, detail="User already exists")  # 400: bad request
+    """registering user"""
+    create_user_model = Users(
+        username=create_user_request.username,
+        first_name=create_user_request.first_name,
+        surname=create_user_request.surname,
+        hashed_password=bcrypt_context.hash(create_user_request.password),
+        store_name=create_user_request.store_name
+    )
+
+    db.add(create_user_model)
+    db.commit()
+
+
+@router.post("/login/", response_model=Token)
+async def login_for_access_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
+):
+    """logging in user"""
+    user = authenticate_user(form_data.username, form_data.password, db)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
+        )
+    # Create token from the authenticated user
+    token = create_access_token(user.username, user.id, user.store_name, timedelta(minutes=30))
+
+    return {"access_token": token, "token_type": "bearer"}
+
+
+def authenticate_user(username: str, password: str, db: db_dependency):
+    """checking match of username and password"""
+    user = db.query(Users).filter(Users.username == username).first()
+    if not user:
+        return False
+    if not bcrypt_context.verify(password, user.hashed_password):
+        return False
+
+    return user
+
+
+def create_access_token(username: str, user_id: int, store_name: str, expires_delta: timedelta):
+    """creating a token for an authenticated user"""
+    claims = {"sub": username, "id": user_id, "store_name": store_name}
+    expires = datetime.utcnow() + expires_delta
+    claims.update({"exp": expires})
+    token = jwt.encode(claims, SECRET_KEY, algorithm=ALGORITHM)
+
+    return token
+
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+    """get the logged-in user"""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        user_id: int = payload.get("id")
+        store_name: str = payload.get("store_name")
+        if username is None or user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate user",
+            )
+        return {"username": username, "id": user_id, "store_name": store_name}
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
+        )

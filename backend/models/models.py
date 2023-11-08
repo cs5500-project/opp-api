@@ -10,3 +10,4 @@ class Users(Base):
     first_name = Column(String)
     surname = Column(String)
     hashed_password = Column(String)
+    store_name = Column(String)
