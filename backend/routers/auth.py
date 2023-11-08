@@ -34,6 +34,7 @@ class CreateUserRequest(BaseModel):
     surname: str
     password: str
     store_name: str
+    email: str
 
 
 class Token(BaseModel):
@@ -63,7 +64,8 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         first_name=create_user_request.first_name,
         surname=create_user_request.surname,
         hashed_password=bcrypt_context.hash(create_user_request.password),
-        store_name=create_user_request.store_name
+        store_name=create_user_request.store_name,
+        email=create_user_request.email
     )
 
     db.add(create_user_model)
@@ -81,7 +83,7 @@ async def login_for_access_token(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
         )
     # Create token from the authenticated user
-    token = create_access_token(user.username, user.id, user.store_name, timedelta(minutes=30))
+    token = create_access_token(user.username, user.id, user.store_name, user.email, timedelta(minutes=30))
 
     return {"access_token": token, "token_type": "bearer"}
 
@@ -97,9 +99,9 @@ def authenticate_user(username: str, password: str, db: db_dependency):
     return user
 
 
-def create_access_token(username: str, user_id: int, store_name: str, expires_delta: timedelta):
+def create_access_token(username: str, user_id: int, store_name: str, email: str, expires_delta: timedelta):
     """creating a token for an authenticated user"""
-    claims = {"sub": username, "id": user_id, "store_name": store_name}
+    claims = {"sub": username, "id": user_id, "store_name": store_name, "email": email}
     expires = datetime.utcnow() + expires_delta
     claims.update({"exp": expires})
     token = jwt.encode(claims, SECRET_KEY, algorithm=ALGORITHM)
@@ -114,12 +116,13 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         username: str = payload.get("sub")
         user_id: int = payload.get("id")
         store_name: str = payload.get("store_name")
+        email: str = payload.get("email")
         if username is None or user_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate user",
             )
-        return {"username": username, "id": user_id, "store_name": store_name}
+        return {"username": username, "id": user_id, "store_name": store_name, "email": email}
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
