@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class UserCreateModel(BaseModel):
@@ -16,17 +17,11 @@ class Token(BaseModel):
     token_type: str = "bearer"
 
 
-class OrderCreateModel(BaseModel):
+class OrderModel(BaseModel):
     amount_paid: int
-    order_detail: str
-    order_time: int
-
-
-class OrderReturnModel(BaseModel):
-    order_id: int
+    detail: str
 
 
 class OrderUpdateModel(BaseModel):
-    amount_paid: int
-    order_detail: str
-    order_time: int
+    amount_paid: Optional[int] = None
+    detail: Optional[str] = None

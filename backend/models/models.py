@@ -1,15 +1,16 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.sql import func
 from database import Base
 
-# from datetime import datetime
+from datetime import datetime
 
 # define the enum list for card type, notice the card type is string now, todo
-import enum
+# import enum
 
 
-class Card_Type(enum.Enum):
-    credit_card = 1
-    debit_card = 2
+# class Card_Type(enum.Enum):
+#     credit_card = 1
+#     debit_card = 2
 
 
 class Users(Base):
@@ -27,9 +28,9 @@ class Orders(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     amount_paid = Column(Integer)
-    order_detail = Column(String)
+    detail = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"))
-    order_time = Column(String)
+    create_time = Column(DateTime(timezone=False), default=func.now())
 
 
 # create database for cards
@@ -41,4 +42,3 @@ class Cards(Base):
     expiration_date = Column(String)
     cvv = Column(Integer)
     type = Column(String)
-    # user id?

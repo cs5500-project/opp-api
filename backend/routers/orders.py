@@ -50,7 +50,7 @@ async def get_order(db: db_dependency, id: int, user: user_dependency):
 @router.post("/create_order", status_code=status.HTTP_201_CREATED)
 async def create_order(
     db: db_dependency,
-    create_order_request: OrderCreateModel,
+    create_order_request: OrderModel,
     user: user_dependency,  # Assuming oauth2_bearer is your dependency to get the JWT token
 ):
     """Create a new order"""
@@ -60,8 +60,7 @@ async def create_order(
         .filter(
             Orders.amount_paid == create_order_request.amount_paid,
             Orders.user_id == user.get("id"),
-            Orders.order_detail == create_order_request.order_detail,
-            Orders.order_time == create_order_request.order_time,
+            Orders.detail == create_order_request.detail,
         )
         .first()
     )
@@ -91,33 +90,21 @@ async def update_order(
     # Check if the desired order exists
     existing_order = (
         db.query(Orders)
-        .filter(
-            Orders.id == id,
-        )
+        .filter(Orders.id == id, Orders.user_id == user.get("id"))
         .first()
     )
 
     if not existing_order:
         raise HTTPException(status_code=400, detail="Order does not exists")
 
-    # Create a new order
-    update_order_model = Orders(
-        amount_paid=update_order_request.amount_paid,
-        order_detail=update_order_request.order_detail,
-        order_time=update_order_request.order_time,
-        # all users are not allowed to update the user id
-    )
-
     db.query(Orders).filter(Orders.id == id).update(
         {
-            "amount_paid": update_order_request.amount_paid,
-            "order_detail": update_order_request.order_detail,
-            "order_time": update_order_request.order_time,
+            "amount_paid": update_order_request.amount_paid
+            or existing_order.amount_paid,
+            "detail": update_order_request.detail or existing_order.detail,
         }
     )
-
     db.commit()
-    return update_order_model
 
 
 # merchant delete order
