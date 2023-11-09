@@ -10,7 +10,8 @@ class Users(Base):
     hashed_password = Column(String)
 
 
-class Consumers(Users):
-    __tablename__ = "consumers"
+# class Consumers(Users):
+#     __tablename__ = "consumers"
 
-    id = Column(Integer, primary_key=True)
+#     id = Column(Integer, primary_key=True)
+#     username = Mapped
