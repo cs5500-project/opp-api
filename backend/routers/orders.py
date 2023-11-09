@@ -91,7 +91,7 @@ async def create_order(
    
     
 @router.put("/update_order/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def updat_order(
+async def update_order(
     db: auth.db_dependency,
     update_order_request: OrderUpdateModel,
     order_id : int,
