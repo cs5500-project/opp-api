@@ -81,18 +81,18 @@ async def create_order(
     # return create_order_model
 
 
-@router.put("/update_order/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/update_order/{id}", status_code=status.HTTP_201_CREATED)
 async def update_order(
     db: db_dependency,
     update_order_request: OrderUpdateModel,
-    order_id: int,
+    id: int,
     user: user_dependency,  # Assuming oauth2_bearer is your dependency to get the JWT token
 ):
     # Check if the desired order exists
     existing_order = (
         db.query(Orders)
         .filter(
-            Orders.order_id == order_id,
+            Orders.id == id,
         )
         .first()
     )
@@ -108,7 +108,7 @@ async def update_order(
         # all users are not allowed to update the user id
     )
 
-    db.query(Orders).filter(Orders.order_id == order_id).update(
+    db.query(Orders).filter(Orders.id == id).update(
         {
             "amount_paid": update_order_request.amount_paid,
             "order_detail": update_order_request.order_detail,
@@ -121,22 +121,20 @@ async def update_order(
 
 
 # merchant delete order
-@router.delete("/delete_order/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_orders(db: db_dependency, order_id: int, user: user_dependency):
+@router.delete("/delete_order/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_orders(db: db_dependency, id: int, user: user_dependency):
     # Check if the desired order exists
     existing_order = (
         db.query(Orders)
         .filter(
-            Orders.order_id == order_id,
+            Orders.id == id,
         )
         .first()
     )
-    if existing_order.id != user.id:
-        raise HTTPException(status_code=401, detail="Unauthorized user")
-
     if not existing_order:
         raise HTTPException(status_code=400, detail="Order does not exists")
+    if existing_order.user_id != user.get("id"):
+        raise HTTPException(status_code=401, detail="Unauthorized user")
 
-    db.query(Orders).filter(Orders.order_id == order_id).delete()
+    db.query(Orders).filter(Orders.id == id).delete()
     db.commit()
-    return "Order Deleted!"
