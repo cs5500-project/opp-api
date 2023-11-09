@@ -13,20 +13,6 @@ from schemas import *
 router = APIRouter(prefix='/orders', tags=['orders'])
 
 
-class GenericObjectRequest(BaseModel):
-    name: str = Field(min_length=3, max_length=100)
-    price: float = Field(gt=0, lt=6)
-
-    class Config:
-        json_schema_extra = {
-            'example': {
-                'name': 'foobar',
-                'price': 3.324
-            }
-        }
-
-
-
 # validate user with returning a token -- for future action after validation
 def validate_user(db : auth.db_dependency, 
                   token: str = Query(..., description="JWT token")):
@@ -43,7 +29,6 @@ def validate_user(db : auth.db_dependency,
         return False
     else:
         return user
-
 
 
 
