@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 from schemas import *
 from database import SessionLocal
-from models import Users
+from models.models import Users
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -41,9 +41,9 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserReturnModel)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: UserCreateModel):
-    found_user = (
+    found_user = ( 
         db.query(Users).filter(create_user_request.username == Users.username).first()
     )
     if found_user:
@@ -57,11 +57,8 @@ async def create_user(db: db_dependency, create_user_request: UserCreateModel):
     )
     db.add(create_user_model)
     db.commit()
-    created_user = (
-        db.query(Users).filter(Users.username == create_user_request.username).first()
-    )
-    return created_user
-
+    created_user = db.query(Users).filter(Users.username == create_user_request.username).first()
+    # return {created_user}
 
 @router.post("/login/", response_model=Token)
 async def login_for_access_token(
@@ -74,11 +71,9 @@ async def login_for_access_token(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
         )
     # Create token from the authenticated user
-    token = Token(
-        access_token=create_access_token(user.username, user.id, timedelta(minutes=30))
-    )
+    token = access_token=create_access_token(user.id, user.username, timedelta(minutes=30))
 
-    return token
+    return {'access_token': token, 'token_type': 'bearer'}
 
 
 def authenticate_user(username: str, password: str, db: db_dependency):
@@ -98,30 +93,29 @@ def create_access_token(user_id: int, username: str, expires_delta: timedelta):
     expires = datetime.utcnow() + expires_delta
     claims.update({"exp": expires})
     token = jwt.encode(claims, SECRET_KEY, algorithm=ALGORITHM)
-
     return token
 
-
-async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+# async 
+def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     """get the logged-in user"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        user_id: int = payload.get("id")
+        id: int = payload.get("id")
         store_name: str = payload.get("store_name")
         email: str = payload.get("email")
-        if username is None or user_id is None:
+        if username is None or id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Could not validate user",
+                detail="Can't authenticate the user",
             )
         return {
             "username": username,
-            "id": user_id,
+            "id": id,
             "store_name": store_name,
             "email": email,
         }
-    except JWTError:
+    except JWTError as e:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Fail to authenticate the user."
         )
