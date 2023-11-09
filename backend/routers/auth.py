@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 
 from schemas import *
 from database import SessionLocal
+from database import db_dependency
 from models.models import Users
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -30,37 +31,26 @@ bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-db_dependency = Annotated[Session, Depends(get_db)]
-
-
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: UserCreateModel):
-    found_user = ( 
+    found_user = (
         db.query(Users).filter(create_user_request.username == Users.username).first()
     )
     if found_user:
         raise HTTPException(
-            status_code=400, detail="User already exists"
+            status_code=400, detail="Username already exists"
         )  # 400: bad request
     """registering user"""
     create_user_model = Users(
         username=create_user_request.username,
         hashed_password=bcrypt_context.hash(create_user_request.password),
+        type=create_user_request.type,
     )
     db.add(create_user_model)
     db.commit()
-    created_user = db.query(Users).filter(Users.username == create_user_request.username).first()
-    # return {created_user}
 
-@router.post("/login/", response_model=Token)
+
+@router.post("/login", response_model=Token)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
 ):
@@ -71,9 +61,11 @@ async def login_for_access_token(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
         )
     # Create token from the authenticated user
-    token = access_token=create_access_token(user.id, user.username, timedelta(minutes=30))
+    token = access_token = create_access_token(
+        user.id, user.username, user.type, timedelta(minutes=30)
+    )
 
-    return {'access_token': token, 'token_type': 'bearer'}
+    return {"access_token": token, "token_type": "bearer"}
 
 
 def authenticate_user(username: str, password: str, db: db_dependency):
@@ -87,35 +79,33 @@ def authenticate_user(username: str, password: str, db: db_dependency):
     return user
 
 
-def create_access_token(user_id: int, username: str, expires_delta: timedelta):
+def create_access_token(
+    user_id: int, username: str, type: str, expires_delta: timedelta
+):
     """creating a token for an authenticated user"""
-    claims = {"sub": username, "id": user_id}
+    claims = {"username": username, "id": user_id, "type": type}
     expires = datetime.utcnow() + expires_delta
     claims.update({"exp": expires})
     token = jwt.encode(claims, SECRET_KEY, algorithm=ALGORITHM)
     return token
 
-# async 
+
+# async
 def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     """get the logged-in user"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
+        username: str = payload.get("username")
         id: int = payload.get("id")
-        store_name: str = payload.get("store_name")
-        email: str = payload.get("email")
+        type: str = payload.get("type")
         if username is None or id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Can't authenticate the user",
             )
-        return {
-            "username": username,
-            "id": id,
-            "store_name": store_name,
-            "email": email,
-        }
+        return {"username": username, "id": id, "type": type}
     except JWTError as e:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Fail to authenticate the user."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Fail to authenticate the user.",
         )

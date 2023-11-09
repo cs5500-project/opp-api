@@ -18,6 +18,3 @@ app.include_router(auth.router)
 
 # Set order API on router
 app.include_router(orders.router)
-
-
-
