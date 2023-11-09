@@ -1,16 +1,18 @@
 from datetime import timedelta, datetime
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from starlette import status
-from database.database import SessionLocal
-from models.models import Users
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
 import os
 from dotenv import load_dotenv
+
+from schemas import *
+from database import SessionLocal
+from models import Users
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -28,20 +30,6 @@ bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
-class CreateUserRequest(BaseModel):
-    username: str
-    first_name: str
-    surname: str
-    password: str
-    store_name: str
-    email: str
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
 def get_db():
     db = SessionLocal()
     try:
@@ -53,23 +41,26 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_user(db: db_dependency, create_user_request: CreateUserRequest):
-    found_user = db.query(Users).filter(create_user_request.username == Users.username).first()
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserReturnModel)
+async def create_user(db: db_dependency, create_user_request: UserCreateModel):
+    found_user = (
+        db.query(Users).filter(create_user_request.username == Users.username).first()
+    )
     if found_user:
-        raise HTTPException(status_code=400, detail="User already exists")  # 400: bad request
+        raise HTTPException(
+            status_code=400, detail="User already exists"
+        )  # 400: bad request
     """registering user"""
     create_user_model = Users(
         username=create_user_request.username,
-        first_name=create_user_request.first_name,
-        surname=create_user_request.surname,
         hashed_password=bcrypt_context.hash(create_user_request.password),
-        store_name=create_user_request.store_name,
-        email=create_user_request.email
     )
-
     db.add(create_user_model)
     db.commit()
+    created_user = (
+        db.query(Users).filter(Users.username == create_user_request.username).first()
+    )
+    return created_user
 
 
 @router.post("/login/", response_model=Token)
@@ -83,9 +74,11 @@ async def login_for_access_token(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"
         )
     # Create token from the authenticated user
-    token = create_access_token(user.username, user.id, user.store_name, user.email, timedelta(minutes=30))
+    token = Token(
+        access_token=create_access_token(user.username, user.id, timedelta(minutes=30))
+    )
 
-    return {"access_token": token, "token_type": "bearer"}
+    return token
 
 
 def authenticate_user(username: str, password: str, db: db_dependency):
@@ -99,9 +92,9 @@ def authenticate_user(username: str, password: str, db: db_dependency):
     return user
 
 
-def create_access_token(username: str, user_id: int, store_name: str, email: str, expires_delta: timedelta):
+def create_access_token(user_id: int, username: str, expires_delta: timedelta):
     """creating a token for an authenticated user"""
-    claims = {"sub": username, "id": user_id, "store_name": store_name, "email": email}
+    claims = {"sub": username, "id": user_id}
     expires = datetime.utcnow() + expires_delta
     claims.update({"exp": expires})
     token = jwt.encode(claims, SECRET_KEY, algorithm=ALGORITHM)
@@ -122,7 +115,12 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Could not validate user",
             )
-        return {"username": username, "id": user_id, "store_name": store_name, "email": email}
+        return {
+            "username": username,
+            "id": user_id,
+            "store_name": store_name,
+            "email": email,
+        }
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user"

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from database.database import Base
+from database import Base
 
 
 class Users(Base):
@@ -7,8 +7,10 @@ class Users(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True)
-    email = Column(String, unique=True)
-    first_name = Column(String)
-    surname = Column(String)
     hashed_password = Column(String)
-    store_name = Column(String)
+
+
+class Consumers(Users):
+    __tablename__ = "consumers"
+
+    id = Column(Integer, primary_key=True)
