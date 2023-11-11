@@ -1,27 +1,17 @@
 from datetime import timedelta, datetime
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from starlette import status
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
 import os
 from dotenv import load_dotenv
-
 from schemas import *
-from database import SessionLocal
 from database import db_dependency
 from models.models import Users
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
-""" this is the key and algo I used. They are in .env file - not sure if you also need this so left here
- Later we should remove this
-# SECRET_KEY = "c69c30b9ea4597dd4f5b3824ed4f26bf07b84ea6de79bfa245be395d965d878b"
-# ALGORITHM = "HS256"
-"""
 
 load_dotenv()  # take environment variables from .env.
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -87,7 +77,6 @@ def create_access_token(user_id: int, username: str, expires_delta: timedelta):
     return token
 
 
-# async
 def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     """get the logged-in user"""
     try:
@@ -100,7 +89,7 @@ def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Can't authenticate the user",
             )
-        return {"username": username, "id": id, "type": type}
+        return {"username": username, "id": id}
     except JWTError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

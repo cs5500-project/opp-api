@@ -87,3 +87,4 @@ async def get_by_user_id(db: db_dependency, user: user_dependency):
 async def delete_transaction(id: int, db: db_dependency, user: user_dependency):
     check_user_authentication(user)
     db.query(Transactions).filter(Transactions.id == id).delete()
+    db.commit()
