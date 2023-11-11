@@ -34,19 +34,18 @@ oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/login")
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency, create_user_request: UserCreateModel):
     found_user = (
-        db.query(Users).filter(create_user_request.username == Users.username).first()
+        db.query(Users).filter(Users.username == create_user_request.username).first()
     )
     if found_user:
         raise HTTPException(
             status_code=400, detail="Username already exists"
         )  # 400: bad request
     """registering user"""
-    create_user_model = Users(
+    new_user = Users(
         username=create_user_request.username,
         hashed_password=bcrypt_context.hash(create_user_request.password),
-        type=create_user_request.type,
     )
-    db.add(create_user_model)
+    db.add(new_user)
     db.commit()
 
 
@@ -62,7 +61,7 @@ async def login_for_access_token(
         )
     # Create token from the authenticated user
     token = access_token = create_access_token(
-        user.id, user.username, user.type, timedelta(minutes=30)
+        user.id, user.username, timedelta(minutes=30)
     )
 
     return {"access_token": token, "token_type": "bearer"}
@@ -79,11 +78,9 @@ def authenticate_user(username: str, password: str, db: db_dependency):
     return user
 
 
-def create_access_token(
-    user_id: int, username: str, type: str, expires_delta: timedelta
-):
+def create_access_token(user_id: int, username: str, expires_delta: timedelta):
     """creating a token for an authenticated user"""
-    claims = {"username": username, "id": user_id, "type": type}
+    claims = {"id": user_id, "username": username}
     expires = datetime.utcnow() + expires_delta
     claims.update({"exp": expires})
     token = jwt.encode(claims, SECRET_KEY, algorithm=ALGORITHM)
@@ -95,9 +92,9 @@ def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     """get the logged-in user"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("username")
         id: int = payload.get("id")
-        type: str = payload.get("type")
+        username: str = payload.get("username")
+
         if username is None or id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -109,3 +106,8 @@ def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Fail to authenticate the user.",
         )
+
+
+def check_user_authentication(user):
+    if user is None:
+        raise HTTPException(status_code=401, detail="Authentication Failed")

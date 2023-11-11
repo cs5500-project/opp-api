@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.sql import func
-from database import Base
+from sqlalchemy.ext.declarative import declarative_base
 
 from datetime import datetime
 
@@ -12,6 +12,8 @@ from datetime import datetime
 #     credit_card = 1
 #     debit_card = 2
 
+Base = declarative_base()
+
 
 class Users(Base):
     __tablename__ = "users"
@@ -19,7 +21,6 @@ class Users(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True)
     hashed_password = Column(String)
-    type = Column(String)
 
 
 # Create database for orders
@@ -37,8 +38,6 @@ class Orders(Base):
 class Cards(Base):
     __tablename__ = "cards"
 
-    card_number = Column(Integer, primary_key=True, index=True)
-    username = Column(String)
-    expiration_date = Column(String)
-    cvv = Column(Integer)
+    id = Column(Integer, primary_key=True, index=True)
+    card_number = Column(String(16), unique=True)
     type = Column(String)
