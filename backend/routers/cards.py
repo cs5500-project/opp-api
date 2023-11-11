@@ -22,10 +22,7 @@ async def create_card(request: CardModel, db: db_dependency, user: user_dependen
     if found_card:
         raise HTTPException(status_code=400, detail="Card number is already exists.")
 
-    new_card = Cards(
-        card_number=request.card_number,
-        type=request.type,
-    )
+    new_card = Cards(**request.model_dump())
     db.add(new_card)
     db.commit()
 

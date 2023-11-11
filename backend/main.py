@@ -3,7 +3,7 @@ from starlette import status
 from typing import Annotated
 import models.models
 from database import engine
-from routers import auth, cards
+from routers import auth, cards, transactions
 
 # application
 app = FastAPI()
@@ -14,3 +14,4 @@ models.models.Base.metadata.create_all(bind=engine)
 # Set API endpoints on router
 app.include_router(auth.router)
 app.include_router(cards.router)
+app.include_router(transactions.router)
