@@ -1,4 +1,4 @@
-from pydantic import BaseModel, StringConstraints
+from pydantic import BaseModel, Field  # StringConstraints: will be deprecated in Pydantic 3.0
 from typing import Annotated, Optional
 
 
@@ -23,10 +23,10 @@ class OrderUpdateModel(BaseModel):
 
 
 class CardModel(BaseModel):
-    card_number: Annotated[str, StringConstraints(min_length=16, max_length=16)]
+    card_number: Annotated[str, Field(min_length=16, max_length=16)]
     type: str
 
 
 class CardUpdateModel(BaseModel):
-    card_number: Annotated[str, StringConstraints(min_length=16, max_length=16)] = None
+    card_number: Annotated[str, Field(min_length=16, max_length=16)] = None
     type: str = None
