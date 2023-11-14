@@ -7,9 +7,9 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
 import os
 from dotenv import load_dotenv
-from ..schemas import UserCreateModel, Token
-from ..database import db_dependency
-from ..models.models import Users
+from schemas import UserCreateModel, Token
+from database import db_dependency
+from models.models import Users
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

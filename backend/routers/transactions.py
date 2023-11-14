@@ -3,15 +3,15 @@ from typing import Annotated
 from starlette import status
 from datetime import datetime, timedelta
 
-from ..schemas import (
+from schemas import (
     TransactionCreateModel,
     TransactionResponseModel,
     TransactionStatus
 )
-from ..database import db_dependency
-from ..models.models import Transactions
-from ..routers.auth import get_current_user, check_user_authentication
-from ..routers.validations import check_validations
+from database import db_dependency
+from models.models import Transactions
+from routers.auth import get_current_user, check_user_authentication
+from routers.validations import check_validations
 
 router = APIRouter(prefix="/transaction", tags=["transaction"])
 
