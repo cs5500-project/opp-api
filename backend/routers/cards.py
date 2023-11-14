@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import Annotated
 from starlette import status
 
-from schemas import CardModel, CardResponseModel
-from database import db_dependency
-from models.models import Cards
-from routers.auth import get_current_user, check_user_authentication
+from ..schemas import CardModel, CardResponseModel
+from ..database import db_dependency
+from ..models.models import Cards
+from ..routers.auth import get_current_user, check_user_authentication
 from passlib.context import CryptContext
 
 router = APIRouter(prefix="/card", tags=["card"])

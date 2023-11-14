@@ -2,7 +2,7 @@ import requests
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 from typing import Annotated
-from routers.auth import get_current_user, check_user_authentication
+from ..routers.auth import get_current_user, check_user_authentication
 
 router = APIRouter(prefix="/validate", tags=["validate"])
 

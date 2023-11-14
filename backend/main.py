@@ -1,4 +1,3 @@
-import validations as validations
 from fastapi import FastAPI
 import models
 from database import engine

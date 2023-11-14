@@ -15,16 +15,6 @@ class Token(BaseModel):
     token_type: str = "bearer"
 
 
-# class OrderModel(BaseModel):
-#     amount_paid: int
-#     detail: str
-#
-#
-# class OrderUpdateModel(BaseModel):
-#     amount_paid: Union[int, None] = None
-#     detail: Union[str, None] = None
-
-
 class CardType(str, Enum):
     credit = "credit"
     debit = "debit"
