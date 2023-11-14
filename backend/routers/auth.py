@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
 import os
 from dotenv import load_dotenv
-from schemas import *
+from schemas import UserCreateModel, Token
 from database import db_dependency
 from models.models import Users
 

@@ -1,9 +1,8 @@
-from fastapi import FastAPI, Depends
-from starlette import status
-from typing import Annotated
-import models.models
+import validations as validations
+from fastapi import FastAPI
+import models
 from database import engine
-from routers import auth, cards, transactions
+from routers import auth, cards, transactions, validations
 
 # application
 app = FastAPI()
@@ -15,3 +14,4 @@ models.models.Base.metadata.create_all(bind=engine)
 app.include_router(auth.router)
 app.include_router(cards.router)
 app.include_router(transactions.router)
+app.include_router(validations.router)
