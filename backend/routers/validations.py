@@ -1,6 +1,10 @@
+"""
+helper class - validations: amount validations and fraudulent check using luhn's algo.
+making a call to aws lambda functions.
+
+"""
 import requests
 from fastapi import APIRouter, Depends, HTTPException
-from starlette import status
 from typing import Annotated
 from routers.auth import get_current_user, check_user_authentication
 
@@ -9,11 +13,10 @@ router = APIRouter(prefix="/validate", tags=["validate"])
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
-@router.post("/fraudulent/", status_code=status.HTTP_201_CREATED)
+# @router.post("/fraudulent/", status_code=status.HTTP_201_CREATED)
 async def validate_card_number_luhn_algo(card_number: str, user: user_dependency):
     check_user_authentication(user)
 
-    # card_number = request.card_number
     url = "https://c3jkkrjnzlvl5lxof74vldwug40pxsqo.lambda-url.us-west-2.on.aws"
     data = {"card_number": card_number}
     response = requests.post(url, json=data)
@@ -21,7 +24,7 @@ async def validate_card_number_luhn_algo(card_number: str, user: user_dependency
     return response.json()
 
 
-@router.post("/balance/", status_code=status.HTTP_201_CREATED)  # card_number, amt
+# @router.post("/balance/", status_code=status.HTTP_201_CREATED)  # card_number, amt
 async def validate_card_number_with_amount(card_number: str, amt: float, user: user_dependency):
     check_user_authentication(user)
 

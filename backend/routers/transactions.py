@@ -180,7 +180,7 @@ async def get_by_id(db: db_dependency, user: user_dependency, id: int):
     return transaction
 
 
-@router.delete("/{id}", status_code=status.HTTP_200_OK)
+@router.delete("/{id}/", status_code=status.HTTP_200_OK)
 async def delete_transaction(id: int, db: db_dependency, user: user_dependency):
     check_user_authentication(user)
 
