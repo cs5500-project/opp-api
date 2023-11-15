@@ -7,3 +7,7 @@ Activate your venv: source "venv-name"/bin/activate</br>
 Check your venv: which python</br>
 Pip install: pip install -r requirements.txt</br>
 Run: uvicorn main:app --reload</br>
+</br>
+
+### To run pytest:
+Do: python -m pytest in your terminal
