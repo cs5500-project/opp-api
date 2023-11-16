@@ -116,12 +116,13 @@ def test_get_transaction_by_id():
     }
 
 
-# TODO: this part will fail for you initially because I put 11 as id but
-#  your local db and my db are different so you might not have 11th transaction.
-#  test this based on your db!
 def test_delete_transaction_by_id():
     token = login_user()
+    my_transactions = client.get(
+        "/transaction/transaction-list/all/",
+        headers={"Authorization": "Bearer " + token},
+    )
     response = client.delete(
-        "/transaction/11/", headers={"Authorization": "Bearer " + token}
+        f"/transaction/{my_transactions.json()[-1].get('id')}/", headers={"Authorization": "Bearer " + token}
     )
     assert response.status_code == 200

@@ -30,16 +30,17 @@ async def create_card(request: CardModel, db: db_dependency, user: user_dependen
     db.commit()
 
 
-@router.get("/id/{id}", status_code=status.HTTP_200_OK)
-async def get_card_by_id(id: int, db: db_dependency, user: user_dependency, response_model=CardResponseModel):
+@router.get("/id/{id}/", status_code=status.HTTP_200_OK, response_model=CardResponseModel)
+async def get_card_by_id(id: int, db: db_dependency, user: user_dependency):
     check_user_authentication(user)
     found_card = db.query(Cards).filter(Cards.id == id).first()
     if not found_card:
         raise HTTPException(status_code=404, detail=f"Card {id} does not exist.")
-    return {"last_four_digits": found_card.last_four_digits,
-            "type": found_card.type,
-            "id": found_card.id
-            }
+    # return {"last_four_digits": found_card.last_four_digits,
+    #         "type": found_card.type,
+    #         "id": found_card.id
+    #         }
+    return found_card
 
 
 @router.get("/", status_code=status.HTTP_200_OK)
@@ -72,7 +73,7 @@ async def get_cards(db: db_dependency, user: user_dependency):
 #     db.commit()
 
 
-@router.get("/card-number/{four_digits}",
+@router.get("/card-number/{four_digits}/",
             status_code=status.HTTP_200_OK,
             response_model=CardResponseModel)
 async def get_card_by_four_digits_number(
@@ -84,13 +85,14 @@ async def get_card_by_four_digits_number(
         raise HTTPException(
             status_code=404, detail=f"Card with the last four digits {four_digits} does not exist."
         )
-    return {"last_four_digits": found_card.last_four_digits,
-            "type": found_card.type,
-            "id": found_card.id
-            }
+    # return {"last_four_digits": found_card.last_four_digits,
+    #         "type": found_card.type,
+    #         "id": found_card.id
+    #         }
+    return found_card
 
 
-@router.delete("/id/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/id/{id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_card_by_id(id: int, db: db_dependency, user: user_dependency):
     check_user_authentication(user)
     found_card = db.query(Cards).filter(Cards.id == id).delete()
@@ -100,7 +102,7 @@ async def delete_card_by_id(id: int, db: db_dependency, user: user_dependency):
     db.commit()
 
 
-@router.delete("/card-number/{four_digits}", status_code=status.HTTP_200_OK)
+@router.delete("/card-number/{four_digits}/", status_code=status.HTTP_200_OK)
 async def delete_card_by_number(
     four_digits: str, db: db_dependency, user: user_dependency
 ):
