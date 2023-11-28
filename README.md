@@ -18,5 +18,5 @@ Navigate to the root of this repo.
 </br>
 * Build the image: docker build -t opp_app .
 * Run the container: docker run -d --name opp_app_V1 -p 8000:8000 opp_app
-* Stop the container: docker stop myapp
-* Remove the container: docker remove myapp
+* Stop the container: docker stop opp_app_V1
+* Remove the container: docker remove opp_app_V1
