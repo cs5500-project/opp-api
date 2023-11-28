@@ -11,3 +11,12 @@ Run: uvicorn main:app --reload</br>
 
 ### To run pytest:
 Do: python -m pytest in your terminal
+</br>
+
+### Docker:
+Navigate to the root of this repo.
+</br>
+* Build the image: docker build -t opp_app .
+* Run the container: docker run -d --name opp_app_V1 -p 8000:8000 opp_app
+* Stop the container: docker stop myapp
+* Remove the container: docker remove myapp
