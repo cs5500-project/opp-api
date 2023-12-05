@@ -32,4 +32,4 @@ jobs:
     - name: Test with pytest
       run: |
         # run test
-        putest -vv test/
+        pytest -vv tests/
