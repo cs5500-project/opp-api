@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from ..main import app
+from main import app
 
 client = TestClient(app)
 
@@ -123,6 +123,7 @@ def test_delete_transaction_by_id():
         headers={"Authorization": "Bearer " + token},
     )
     response = client.delete(
-        f"/transaction/{my_transactions.json()[-1].get('id')}/", headers={"Authorization": "Bearer " + token}
+        f"/transaction/{my_transactions.json()[-1].get('id')}/",
+        headers={"Authorization": "Bearer " + token},
     )
     assert response.status_code == 200

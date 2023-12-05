@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 import string
 import random
 
-from ..main import app
+from main import app
 
 client = TestClient(app)
 
