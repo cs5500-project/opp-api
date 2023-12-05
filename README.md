@@ -21,4 +21,5 @@ Navigate to the root of this repo.
 * Stop the container: docker stop opp_app_V1
 * Remove the container: docker remove opp_app_V1
 
-test lint
+### Public URL: 
+http://ec2-3-142-209-225.us-east-2.compute.amazonaws.com:8000/docs
