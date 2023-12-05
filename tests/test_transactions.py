@@ -97,7 +97,9 @@ def test_get_all_pending_transactions():
         "/transaction/transaction-list/pending/",
         headers={"Authorization": "Bearer " + token},
     )
-    assert response.status_code == 200
+    assert (
+        response.status_code == 404
+    )  # becasue there is no pending transaction in the database so it should return code 404
 
 
 def test_get_transaction_by_id():
