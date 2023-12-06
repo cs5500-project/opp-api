@@ -50,7 +50,7 @@ After adding another card, there is another card shown in the system
 
 ![image](https://github.com/cs5500-project/opp-api/assets/115593195/4f6f2714-61e4-4ab9-bb6e-ebccb7560b7c)
 
-#Get card by Id
+# Get card by Id
 
 The example card id is 1
 
