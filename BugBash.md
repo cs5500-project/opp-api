@@ -71,7 +71,7 @@ If the user put the digits that refers to card that does not exist, an error mes
 
 ![image](https://github.com/cs5500-project/opp-api/assets/115593195/e7ff1000-6438-48a5-a84b-f56f94bde343)
 
-#Delete card by last four digits
+# Delete card by last four digits
 
 Delete the card ends with 1054
 
