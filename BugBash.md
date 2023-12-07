@@ -1,6 +1,13 @@
 ### URL to App
 http://ec2-3-142-209-225.us-east-2.compute.amazonaws.com:8000/docs#/
 
+This is our versionv1.0 after fixing issues and adding improvement, some nice-to-have features may be possible in the future:
+ - Design the date time for transaction checking more flexible rather than using fixed patter of the datetime
+ - Apply security practices to protect user data and the system from vulnerbilities
+ - Add more functions in personalizing user profile
+
+Apart from these nice-to-have features, we addressed all issues for this released version
+
 ### How to use the App
 ## User
 # Create User
@@ -166,6 +173,11 @@ And the transaction with id 82 has been deleted
 
 
 ### Link to issue page
+
+
+
+
+
 
 
 
