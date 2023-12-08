@@ -13,9 +13,12 @@ from models.models import Users
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+TEST_SECRET_KEY = "c69c30b9ea4597dd4f5b3824ed4f26bf07b84ea6de79bfa245be395d965d878b"
+TEST_ALGORITHM = "HS256"
+
 load_dotenv()  # take environment variables from .env.
-SECRET_KEY = os.environ.get("SECRET_KEY")
-ALGORITHM = os.environ.get("ALGORITHM")
+SECRET_KEY = os.environ.get("SECRET_KEY") or TEST_SECRET_KEY
+ALGORITHM = os.environ.get("ALGORITHM") or TEST_ALGORITHM
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/login")
