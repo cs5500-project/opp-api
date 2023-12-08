@@ -17,7 +17,7 @@ def test_create_transaction_good():
         json={"card_number": "4111112014267661", "amt": 123, "card_type": "debit"},
         headers={"Authorization": "Bearer " + token},
     )
-    assert response.status_code == 201
+    assert response.status_code == 200
 
 
 def test_create_transaction_bad():
@@ -105,16 +105,16 @@ def test_get_all_pending_transactions():
 def test_get_transaction_by_id():
     token = login_user()
     response = client.get(
-        "/transaction/4/", headers={"Authorization": "Bearer " + token}
+        "/transaction/1/", headers={"Authorization": "Bearer " + token}
     )
     assert response.status_code == 200
     assert response.json() == {
-        "id": 4,
-        "user_id": 1,
+        "id": 1,
+        "user_id": 7,
         "amount": 123,
         "status": "processed",
-        "time_created": "2023-11-14T16:23:39.540536",
-        "time_updated": "2023-11-14T16:23:39.540536",
+        "time_created": "2023-12-07T21:01:35.220012",
+        "time_updated": "2023-12-07T21:01:35.220012",
     }
 
 

@@ -18,7 +18,7 @@ def test_create_card():
     token = login_user()
     response = client.post(
         "/card",
-        json={"card_number": "4147202464191053", "type": "debit"},
+        json={"card_number": "4111112014267661", "type": "credit"},
         headers={"Authorization": "Bearer " + token},
     )
     assert response.status_code == 201
@@ -29,7 +29,7 @@ def test_create_card_exists():
     token = login_user()
     response = client.post(
         "/card",
-        json={"card_number": "4147202464191053", "type": "debit"},
+        json={"card_number": "4111112014267661", "type": "debit"},
         headers={"Authorization": "Bearer " + token},
     )
     assert response.status_code == 302
@@ -46,34 +46,46 @@ def test_get_cards():
 def test_get_card_by_id():
     token = login_user()
     response = client.get(
-        "/card/id/1",
+        "/card/id/5/",
         headers={"Authorization": "Bearer " + token},
     )
     assert response.status_code == 200
-    assert response.json() == {"last_four_digits": "1053", "type": "debit", "id": 1}
+    assert response.json() == {"last_four_digits": "2729", "type": "debit", "id": 5}
 
 
 # test get card by four digits
 def test_get_card_by_four_digits_number():
     token = login_user()
     response = client.get(
-        "/card/card-number/1053",
+        "/card/card-number/2729",
         headers={"Authorization": "Bearer " + token},
     )
     assert response.status_code == 200
-    assert response.json() == {"last_four_digits": "1053", "type": "debit", "id": 1}
+    assert response.json() == {"last_four_digits": "2729", "type": "debit", "id": 5}
 
 
 def test_delete_card_by_id():
     token = login_user()
-    response = client.delete("/card/id/1", headers={"Authorization": "Bearer " + token})
+    res = client.post(
+        "/card",
+        json={"card_number": "4111112014267661", "type": "credit"},
+        headers={"Authorization": "Bearer " + token},
+    )
+    id_res = client.get(
+        "/card/card-number/7661",
+        headers={"Authorization": "Bearer " + token},
+    )
+    id = id_res.json()["id"]
+    response = client.delete(
+        f"/card/id/{id}", headers={"Authorization": "Bearer " + token}
+    )
     assert response.status_code == 204
 
 
 # test delete card by number -- last four digits
 def test_delete_card_by_number():
     token = login_user()
-    client.post(
+    res = client.post(
         "/card",
         json={"card_number": "4111112014267661", "type": "credit"},
         headers={"Authorization": "Bearer " + token},

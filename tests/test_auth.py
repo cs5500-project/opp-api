@@ -26,7 +26,7 @@ def test_create_user():
 def test_create_user_duplicate_name():
     response = client.post(
         "/auth",
-        json={"username": "xiaolin", "password": "1234"},
+        json={"username": "hyojin", "password": "12345"},
         headers={"Content-Type": "application/json"},
     )
     assert response.status_code == 400
