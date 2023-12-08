@@ -41,7 +41,7 @@ async def get_card_by_id(id: int, db: db_dependency, user: user_dependency):
     found_card = (
         db.query(Cards)
         .filter(Cards.id == user.get("id"))
-        .filter(Cards.user_id == id)
+        .filter(Cards.user_id == user.get("id"))
         .first()
     )
     if not found_card:

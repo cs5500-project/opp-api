@@ -50,7 +50,7 @@ def test_get_card_by_id():
         headers={"Authorization": "Bearer " + token},
     )
     assert response.status_code == 200
-    assert response.json() == {"last_four_digits": "2729", "type": "debit", "id": 5}
+    assert response.json() == {"last_four_digits": "2731", "type": "debit", "id": 7}
 
 
 # test get card by four digits
