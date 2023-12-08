@@ -23,3 +23,6 @@ Navigate to the root of this repo.
 
 ### Public URL: 
 http://ec2-3-142-209-225.us-east-2.compute.amazonaws.com:8000/docs
+
+### YouTube URL
+https://youtu.be/FAIq7ZabKrU
