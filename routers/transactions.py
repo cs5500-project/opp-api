@@ -18,7 +18,7 @@ router = APIRouter(prefix="/transaction", tags=["transaction"])
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_200_OK)
 async def create_transaction(request: TransactionCreateModel,
                              user: user_dependency,
                              db: db_dependency):
@@ -48,6 +48,7 @@ async def create_transaction(request: TransactionCreateModel,
                                    status=transaction_status)
     db.add(new_transaction)
     db.commit()
+    return "Transaction Created"
 
 
 @router.put('/', status_code=status.HTTP_202_ACCEPTED)
