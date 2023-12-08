@@ -1,12 +1,7 @@
 ### URL to App
 http://ec2-3-142-209-225.us-east-2.compute.amazonaws.com:8000/docs#/
 
-This is our versionv1.0 after fixing issues and adding improvement, some nice-to-have features may be possible in the future:
- - Design the date time for transaction checking more flexible rather than using fixed patter of the datetime
- - Apply security practices to protect user data and the system from vulnerbilities
- - Add more functions in personalizing user profile
 
-Apart from these nice-to-have features, we addressed all issues for this released version
 
 ### How to use the App
 ## User
@@ -51,11 +46,11 @@ Add another card ends with 1054
 
 # Get cards
 
-![image](https://github.com/cs5500-project/opp-api/assets/115593195/25d56c10-6c62-4d8c-b146-fb9cf2ad6d50)
+<img width="1216" alt="image" src="https://github.com/cs5500-project/opp-api/assets/115593195/6ddbb365-1adf-49c6-af16-64b5b690b2d8">
 
 After adding another card, there is another card shown in the system
 
-![image](https://github.com/cs5500-project/opp-api/assets/115593195/4f6f2714-61e4-4ab9-bb6e-ebccb7560b7c)
+<img width="1211" alt="image" src="https://github.com/cs5500-project/opp-api/assets/115593195/703878b2-8436-48e9-a647-42a582a6e52e">
 
 # Get card by Id
 
