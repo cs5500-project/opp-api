@@ -23,18 +23,27 @@ async def create_card(request: CardModel, db: db_dependency, user: user_dependen
     found_card = db.query(Cards).filter(last_four == Cards.last_four_digits).first()
     if found_card:
         raise HTTPException(status_code=302, detail="existing card found.")
-    new_card = Cards(card_number=bcrypt_context.hash(request.card_number),
-                     type=request.type,
-                     user_id=user.get("id"),
-                     last_four_digits=last_four)
+    new_card = Cards(
+        card_number=bcrypt_context.hash(request.card_number),
+        type=request.type,
+        user_id=user.get("id"),
+        last_four_digits=last_four,
+    )
     db.add(new_card)
     db.commit()
 
 
-@router.get("/id/{id}/", status_code=status.HTTP_200_OK, response_model=CardResponseModel)
+@router.get(
+    "/id/{id}/", status_code=status.HTTP_200_OK, response_model=CardResponseModel
+)
 async def get_card_by_id(id: int, db: db_dependency, user: user_dependency):
     check_user_authentication(user)
-    found_card = db.query(Cards).filter(Cards.id == id).filter(Cards.user_id == id) .first()
+    found_card = (
+        db.query(Cards)
+        .filter(Cards.id == user.get("id"))
+        .filter(Cards.user_id == id)
+        .first()
+    )
     if not found_card:
         raise HTTPException(status_code=404, detail=f"Card {id} does not exist.")
     # return {"last_four_digits": found_card.last_four_digits,
@@ -74,9 +83,11 @@ async def get_cards(db: db_dependency, user: user_dependency):
 #     db.commit()
 
 
-@router.get("/card-number/{four_digits}/",
-            status_code=status.HTTP_200_OK,
-            response_model=CardResponseModel)
+@router.get(
+    "/card-number/{four_digits}/",
+    status_code=status.HTTP_200_OK,
+    response_model=CardResponseModel,
+)
 async def get_card_by_four_digits_number(
     four_digits: str, db: db_dependency, user: user_dependency
 ):
@@ -84,7 +95,8 @@ async def get_card_by_four_digits_number(
     found_card = db.query(Cards).filter(Cards.last_four_digits == four_digits).first()
     if not found_card:
         raise HTTPException(
-            status_code=404, detail=f"Card with the last four digits {four_digits} does not exist."
+            status_code=404,
+            detail=f"Card with the last four digits {four_digits} does not exist.",
         )
     # return {"last_four_digits": found_card.last_four_digits,
     #         "type": found_card.type,
@@ -96,7 +108,12 @@ async def get_card_by_four_digits_number(
 @router.delete("/id/{id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_card_by_id(id: int, db: db_dependency, user: user_dependency):
     check_user_authentication(user)
-    found_card = db.query(Cards).filter(Cards.id == id).filter(Cards.user_id == id).delete()
+    found_card = (
+        db.query(Cards)
+        .filter(Cards.id == id)
+        .filter(Cards.user_id == user.get("id"))
+        .delete()
+    )
     if not found_card:
         raise HTTPException(status_code=404, detail=f"Card {id} does not exist.")
 
@@ -111,7 +128,8 @@ async def delete_card_by_number(
     found_card = db.query(Cards).filter(Cards.last_four_digits == four_digits).delete()
     if not found_card:
         raise HTTPException(
-            status_code=404, detail=f"Card with the last four digits {four_digits} does not exist."
+            status_code=404,
+            detail=f"Card with the last four digits {four_digits} does not exist.",
         )
 
     db.commit()
