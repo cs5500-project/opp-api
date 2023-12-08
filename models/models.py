@@ -15,7 +15,7 @@ class Users(Base):
 
 class Cards(Base):
     __tablename__ = "cards"
-
+    user_id = Column(Integer, ForeignKey("users.id")) 
     id = Column(Integer, primary_key=True, index=True)
     card_number = Column(String, unique=True)  # hashed card number
     type = Column(String)
@@ -26,7 +26,7 @@ class Transactions(Base):
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id")) 
     # card_id = Column(Integer, ForeignKey("cards.id"))
     time_created = Column(DateTime)
     time_updated = Column(DateTime)

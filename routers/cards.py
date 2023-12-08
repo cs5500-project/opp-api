@@ -25,6 +25,7 @@ async def create_card(request: CardModel, db: db_dependency, user: user_dependen
         raise HTTPException(status_code=302, detail="existing card found.")
     new_card = Cards(card_number=bcrypt_context.hash(request.card_number),
                      type=request.type,
+                     user_id=user.get("id"),
                      last_four_digits=last_four)
     db.add(new_card)
     db.commit()
@@ -33,7 +34,7 @@ async def create_card(request: CardModel, db: db_dependency, user: user_dependen
 @router.get("/id/{id}/", status_code=status.HTTP_200_OK, response_model=CardResponseModel)
 async def get_card_by_id(id: int, db: db_dependency, user: user_dependency):
     check_user_authentication(user)
-    found_card = db.query(Cards).filter(Cards.id == id).first()
+    found_card = db.query(Cards).filter(Cards.id == id).filter(Cards.user_id == id) .first()
     if not found_card:
         raise HTTPException(status_code=404, detail=f"Card {id} does not exist.")
     # return {"last_four_digits": found_card.last_four_digits,
@@ -46,7 +47,7 @@ async def get_card_by_id(id: int, db: db_dependency, user: user_dependency):
 @router.get("/", status_code=status.HTTP_200_OK)
 async def get_cards(db: db_dependency, user: user_dependency):
     check_user_authentication(user)
-    cards = db.query(Cards).all()
+    cards = db.query(Cards).filter(Cards.user_id == user.get("id")).all()
     if not cards:
         raise HTTPException(status_code=404, detail="there are no saved cards.")
     return cards
@@ -95,7 +96,7 @@ async def get_card_by_four_digits_number(
 @router.delete("/id/{id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_card_by_id(id: int, db: db_dependency, user: user_dependency):
     check_user_authentication(user)
-    found_card = db.query(Cards).filter(Cards.id == id).delete()
+    found_card = db.query(Cards).filter(Cards.id == id).filter(Cards.user_id == id).delete()
     if not found_card:
         raise HTTPException(status_code=404, detail=f"Card {id} does not exist.")
 
